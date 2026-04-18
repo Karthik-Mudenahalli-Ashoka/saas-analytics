@@ -9,8 +9,6 @@ import numpy as np
 from faker import Faker
 from datetime import datetime, timedelta
 import random
-import json
-import os
 
 fake = Faker()
 
@@ -136,6 +134,8 @@ def generate_events(users_df, end_date):
             active_days = random.randint(7, min(90, active_days))
         elif persona == "at_risk":
             active_days = int(active_days * random.uniform(0.4, 0.7))
+        else:
+            active_days = min(active_days, 180)  # cap at 6 months
 
         mu, sigma     = session_params[persona]
         d_mu, d_sigma = depth_params[persona]
@@ -235,7 +235,7 @@ def generate_subscriptions(users_df, end_date):
                     "timestamp":       churn_dt,
                 })
         elif persona == "at_risk" and random.random() < 0.4:
-            downgrade_dt   = upgrade_dt + timedelta(days=random.randint(60, 180))
+            downgrade_dt    = upgrade_dt + timedelta(days=random.randint(60, 180))
             downgraded_plan = PLANS[max(0, PLANS.index(plan) - 1)]
             if downgrade_dt <= end_date:
                 records.append({
@@ -287,7 +287,7 @@ def generate_ab_assignments(users_df):
 # ─────────────────────────────────────────────
 # MAIN ENTRY POINT (called by Streamlit)
 # ─────────────────────────────────────────────
-def generate_all(num_users=5000, seed=42,
+def generate_all(num_users=1000, seed=42,
                  start_date=datetime(2023, 1, 1),
                  end_date=datetime(2024, 12, 31)):
     """
@@ -298,17 +298,16 @@ def generate_all(num_users=5000, seed=42,
     random.seed(seed)
     Faker.seed(seed)
 
-    users_df = generate_users(num_users, start_date, end_date, seed)
-    events_df      = generate_events(users_df, end_date)
-    subs_df        = generate_subscriptions(users_df, end_date)
-    ab_df          = generate_ab_assignments(users_df)
+    users_df  = generate_users(num_users, start_date, end_date, seed)
+    events_df = generate_events(users_df, end_date)
+    subs_df   = generate_subscriptions(users_df, end_date)
+    ab_df     = generate_ab_assignments(users_df)
 
-    # Drop persona before returning (simulation artifact)
     users_export = users_df.drop(columns=["persona"])
 
     return {
-        "users":         users_export,
-        "events":        events_df,
-        "subscriptions": subs_df,
+        "users":          users_export,
+        "events":         events_df,
+        "subscriptions":  subs_df,
         "ab_experiments": ab_df,
     }
