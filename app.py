@@ -46,7 +46,7 @@ with st.sidebar:
 
     st.markdown("---")
     st.subheader("⚙️ Data Settings")
-    num_users = st.slider("Number of Users", 1000, 10000, 5000, step=500)
+    num_users = st.slider("Number of Users", 500, 2000, 500, step=500)
     seed      = st.number_input("Random Seed", value=42, step=1)
 
     if st.button("🔄 Regenerate Data", use_container_width=True):
