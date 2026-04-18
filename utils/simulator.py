@@ -135,8 +135,7 @@ def generate_events(users_df, end_date):
         elif persona == "at_risk":
             active_days = int(active_days * random.uniform(0.4, 0.7))
         else:
-            active_days = min(active_days, 180)  # cap at 6 months
-
+            active_days = min(active_days, 90)  # cap at 3 months
         mu, sigma     = session_params[persona]
         d_mu, d_sigma = depth_params[persona]
         affinity      = feature_affinity[persona]
@@ -287,9 +286,9 @@ def generate_ab_assignments(users_df):
 # ─────────────────────────────────────────────
 # MAIN ENTRY POINT (called by Streamlit)
 # ─────────────────────────────────────────────
-def generate_all(num_users=1000, seed=42,
+def generate_all(num_users=500, seed=42,
                  start_date=datetime(2023, 1, 1),
-                 end_date=datetime(2024, 12, 31)):
+                 end_date=datetime(2024, 6, 30)):  # shorter date range too
     """
     Generate all four datasets and return as a dict of DataFrames.
     Called by app.py — results are cached in st.session_state.
