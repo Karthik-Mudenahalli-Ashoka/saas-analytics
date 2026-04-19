@@ -466,11 +466,6 @@ elif page == "🧪 A/B Testing":
     fig_ci.add_trace(go.Bar(
         x=["Control", "Treatment"],
         y=[ctrl_mean, treat_mean],
-        error_y=dict(
-            type="constant",
-            value=(treat_mean - ctrl_mean) if not significant else abs(treat_mean - ctrl_mean),
-            visible=False,
-        ),
         marker_color=["#636EFA", "#00CC96" if significant else "#EF553B"],
         text=[f"{ctrl_mean*100:.2f}%" if metric_choice != "Avg Events per User" else f"{ctrl_mean:.1f}",
               f"{treat_mean*100:.2f}%" if metric_choice != "Avg Events per User" else f"{treat_mean:.1f}"],
